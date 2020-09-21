@@ -6,9 +6,13 @@ var obstaclesGroup, obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obsta
 
 var score;
 
+var PLAY = 1;
+var END = 0;
+var state = PLAY;
 
 function preload(){
   trex_running = loadAnimation("trex1.png","trex3.png","trex4.png");
+  
   trex_collided = loadImage("trex_collided.png");
   
   groundImage = loadImage("ground2.png");
@@ -21,6 +25,7 @@ function preload(){
   obstacle4 = loadImage("obstacle4.png");
   obstacle5 = loadImage("obstacle5.png");
   obstacle6 = loadImage("obstacle6.png");
+  
 }
 
 function setup() {
@@ -33,7 +38,7 @@ function setup() {
   ground = createSprite(200,180,400,20);
   ground.addImage("ground",groundImage);
   ground.x = ground.width /2;
-  ground.velocityX = -4;
+  
   
   invisibleGround = createSprite(200,190,400,10);
   invisibleGround.visible = false;
@@ -46,23 +51,40 @@ function setup() {
 
 function draw() {
   background(180);
-  
+    text("Score: "+ score, 500,50);
+  console.log(state);
+  if (state === PLAY){
   score = score + Math.round(getFrameRate()/60);
-  text("Score: "+ score, 500,50);
   
-  if(keyDown("space")) {
-    trex.velocityY = -10;
+  ground.velocityX = -4;
+      spawnClouds();
+  spawnObstacles();
+    
+  if(keyDown("space")&& trex.y > 160) {
+    trex.velocityY = -14;
   }
-  
+         
   trex.velocityY = trex.velocityY + 0.8
   
   if (ground.x < 0){
     ground.x = ground.width/2;
   }
+if (trex.isTouching(obstaclesGroup)){
+    state = END; 
+    
+    }
+  }
   
   trex.collide(invisibleGround);
-  spawnClouds();
-  spawnObstacles();
+if (state === END){
+ trex.velocityY = 0;
+ground.velocityX = 0;
+ obstaclesGroup.setVelocityXEach (0); 
+cloudsGroup.setVelocityXEach (0); 
+   obstaclesGroup.setLifetimeEach(-1);
+   cloudsGroup.setLifetimeEach(-1)
+}
+  
   drawSprites();
 }
 
